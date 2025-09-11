@@ -1,10 +1,12 @@
 import Bot from './struct/Client.js'
-import config from '../config.js'
+import { configDotenv } from 'dotenv'
+
+configDotenv()
 
 async function start() {
     const client = new Bot()
     console.log('NABS Bot Starting..')
-    await client.login(config.token)
+    await client.login(process.env.TOKEN)
     await client.loadCommands()
     await client.loadEvents()
     await client.loadDatabase()
