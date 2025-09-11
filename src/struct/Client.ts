@@ -2,7 +2,6 @@ import { Client, Collection, Intents } from 'discord.js'
 import fs from 'fs'
 import mongoose from 'mongoose'
 import path, { dirname } from 'path'
-import config from '../../config.js'
 import Command from './Command.js'
 import Guild, { GuildInterface } from './Guild.js'
 import { fileURLToPath } from 'url'
@@ -24,14 +23,14 @@ class Bot extends Client {
                 Intents.FLAGS.DIRECT_MESSAGES
             ]
         })
-        this.test = config.test
+        this.test = (process.env.TEST.toLowerCase() == 'true')
         this.commands = new Collection()
         this.guildsData = new Collection()
     }
 
     async loadDatabase() {
         mongoose.set('strictQuery', true)
-        await mongoose.connect(config.mongoURI)
+        await mongoose.connect(process.env.MONGO_URI)
     }
 
     async loadGuilds() {

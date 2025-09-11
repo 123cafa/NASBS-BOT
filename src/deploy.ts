@@ -1,10 +1,12 @@
 import { REST } from '@discordjs/rest'
 import { Routes } from 'discord-api-types/v9'
-import config from '../config.js'
 import fs from 'fs'
 import path, { dirname } from 'path'
 import { fileURLToPath } from 'url'
 import Command from './struct/Command.js'
+import { configDotenv } from 'dotenv'
+
+configDotenv()
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const dirPath = path.resolve(__dirname, './commands')
@@ -18,13 +20,13 @@ for (const file of commandFiles) {
     commands.push(command.getData())
 }
 
-const rest = new REST({ version: '9' }).setToken(config.token)
+const rest = new REST({ version: '9' }).setToken(process.env.TOKEN)
 
 ;(async () => {
     try {
         console.log('Started refreshing global application (/) commands.')
 
-        await rest.put(Routes.applicationCommands(config.clientId), {
+        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
             body: commands
         })
 
