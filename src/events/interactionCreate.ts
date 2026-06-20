@@ -3,8 +3,8 @@ import { CommandInteraction } from 'discord.js'
 
 export default async function execute(client: Bot, interaction: CommandInteraction) {
     if (
-        (!client.test && interaction.guild?.id == '935926834019844097') ||
-        (client.test && interaction.guild?.id != '935926834019844097')
+        (!client.test && interaction.guild?.id == '1377005229618368652') ||
+        (client.test && interaction.guild?.id != '1377005229618368652')
     )
         return
 
