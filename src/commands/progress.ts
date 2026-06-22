@@ -153,7 +153,7 @@ export default new Command({
                         
                         **Progress towards ${guildData.rank3.name}:**
                         ${points.toFixed(2).replace(/[.,]00$/, '')}**/${guildData.rank3.points}** points
-                        ${largeBuildPoints.toFixed(2).replace(/[.,]00$/, '')}**/150** points from Good/Excellent quality Medium builds`
+                        ${largeBuildPoints.toFixed(2).replace(/[.,]00$/, '')}**/75** points from Good/Excellent quality Medium builds`
                     )]
                 })
             }
