@@ -22,6 +22,9 @@ async function addReviewToDb(
     originalSubmission: SubmissionInterface | null,
     i: CommandInteraction
 ) {
+
+    if (!i.guild) return
+    
     // make sure edits don't change the submission type
     if (
         submissionData.edit &&
@@ -41,6 +44,7 @@ async function addReviewToDb(
         if (submissionData.edit && originalSubmission) {
             // for edits ----------------------------------------------------
             // get change from original submission, update user's total points and the countType field
+            // @ts-ignore
             const pointsIncrement = submissionData.pointsTotal - originalSubmission.pointsTotal
             const countTypeIncrement = (() => {
                 // If editing a submission with multiple buildings, get change in user's buildingCount from the submission's building counts, which are broken down by building size
@@ -56,6 +60,7 @@ async function addReviewToDb(
                 else if (submissionData.submissionType === 'ONE') {
                     return 0
                 } else {
+                    // @ts-ignore
                     return countValue - originalSubmission[countType]
                 }
             })()

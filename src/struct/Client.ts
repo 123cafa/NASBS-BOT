@@ -1,4 +1,4 @@
-import { Client, Collection, Intents } from 'discord.js'
+import { Client, Collection, GatewayIntentBits } from 'discord.js'
 import fs from 'fs'
 import mongoose from 'mongoose'
 import path, { dirname } from 'path'
@@ -16,13 +16,14 @@ class Bot extends Client {
     constructor() {
         super({
             intents: [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_MEMBERS,
-                Intents.FLAGS.GUILD_MESSAGES,
-                Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-                Intents.FLAGS.DIRECT_MESSAGES
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.GuildMessageReactions,
+                GatewayIntentBits.DirectMessages
             ]
         })
+        // @ts-ignore
         this.test = (process.env.TEST.toLowerCase() == 'true')
         this.commands = new Collection()
         this.guildsData = new Collection()
@@ -30,7 +31,8 @@ class Bot extends Client {
 
     async loadDatabase() {
         mongoose.set('strictQuery', true)
-        await mongoose.connect(process.env.MONGO_URI)
+        // @ts-ignore
+        mongoose.connect(process.env.MONGO_URI)
     }
 
     async loadGuilds() {
@@ -42,11 +44,15 @@ class Bot extends Client {
 
     async loadCommands() {
         const commands = fs.readdirSync(path.resolve(__dirname, '../commands'))
-        commands.forEach(async (cmd) => {
-            const commandImport = await import(`../commands/${cmd.replace('.ts', '.js')}`)
-            const command = commandImport.default
-            this.commands.set(command.name, command)
-        })
+        for (const cmd of commands) {
+            try {
+                const commandImport = await import(`../commands/${cmd.replace('.ts', '.js')}`)
+                const command = commandImport.default
+                this.commands.set(command.name, command)
+            } catch (e) {
+                console.error(e)
+            }
+        }
     }
 
     async loadEvents() {

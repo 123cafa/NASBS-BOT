@@ -1,7 +1,7 @@
-import Discord from 'discord.js'
+import { EmbedBuilder } from 'discord.js'
 import Command from '../struct/Command.js'
 import Submission from '../struct/Submission.js'
-import { pagination, TypesButtons } from '@devraelfreeze/discordjs-pagination'
+import { ButtonStyles, ButtonTypes, pagination } from '@devraelfreeze/discordjs-pagination'
 
 /**
  * An individual user returned from the aggregation query
@@ -40,18 +40,20 @@ export default new Command({
     ],
     async run(i, client) {
         const options = i.options
+        if (!i.guild) return
         let guild = client.guildsData.get(i.guild.id)
         const global = options.getBoolean('global')
         const metric: string = options.getString('metric') || 'Points'
 
         let guildName: string
-        let queryFilter = []
+
+        let queryFilter: { $match: { guildId: string } }[] = []
 
         if (global) {
             guildName = 'All Build Teams'
             let globalGuild = client.guildsData.get('global')
-            if(globalGuild)
-                guild = globalGuild 
+            if (globalGuild)
+                guild = globalGuild
         } else {
             // for non-global, just find within this guild
             guildName = i.guild.name
@@ -143,6 +145,7 @@ export default new Command({
                 }
             }
 
+            // @ts-ignore
             leaderboard.push({ id: value['_id'], val: res[metric]().toFixed(2).replace(/[.,]00$/, '') })
         }
 
@@ -160,11 +163,12 @@ export default new Command({
             Land: 'm²'
         }
 
-        let pages = []
+        // @ts-ignore
+        let pages: EmbedBuilder[] = []
 
         if (leaderboard.length == 0) {
             pages = [
-                new Discord.MessageEmbed()
+                new EmbedBuilder()
                 .setTitle(`Doesn't look like any builds have been accepted here!`)
                 .setDescription('')
             ]
@@ -173,19 +177,21 @@ export default new Command({
         for (let i = 0; i < Math.ceil(leaderboard.length / ITEMS_PER_PAGE); i++) {
             const startIndex = i * ITEMS_PER_PAGE
             const endIndex = startIndex + ITEMS_PER_PAGE
-            const embed = new Discord.MessageEmbed()
-            .setTitle(`${metric.charAt(0).toUpperCase() + metric.slice(1)} Leaderboard for ${guild.emoji} ${guildName} ${guild.emoji}`)
+            const embed = new EmbedBuilder()
+            .setTitle(`${metric.charAt(0).toUpperCase() + metric.slice(1)} Leaderboard for ${guild?.emoji} ${guildName} ${guild?.emoji}`)
             .setDescription(leaderboard.map((element, index) => {
+                // @ts-ignore
                 return `**${index + 1}.** <@${element.id}>: ${element.val} ${pluralsMap[metric]}`
             }).slice(startIndex, endIndex).join('\n\n'))
 
             pages.push(embed)
         }
 
+        // @ts-ignore
         await pagination({
-            embeds: pages,
-            author: i.user,
-            interaction: i,
+            embeds: <any>pages,
+            author: <any>i.user,
+            interaction: <any>i,
             ephemeral: false,
             time: 60 * 1000,
             disableButtons: true,
@@ -193,14 +199,14 @@ export default new Command({
             pageTravel: false,
             buttons: [
                 {
-                    value: TypesButtons.previous,
+                    type: ButtonTypes.previous,
                     label: 'Previous',
-                    style: 'PRIMARY'
+                    style: ButtonStyles.Primary
                 },
                 {
-                    value: TypesButtons.next,
+                    type: ButtonTypes.next,
                     label: 'Next',
-                    style: 'PRIMARY'
+                    style: ButtonStyles.Primary
                 }
             ]
         })

@@ -1,9 +1,9 @@
-import Discord from 'discord.js'
+import { EmbedBuilder, Snowflake } from 'discord.js'
 import Command from '../struct/Command.js'
 import { ReviewerInterface } from '../struct/Reviewer.js'
 import Submission from '../struct/Submission.js'
 import Rejection from '../struct/Rejection.js'
-import { pagination, TypesButtons } from '@devraelfreeze/discordjs-pagination'
+import { ButtonStyles, ButtonTypes, pagination } from '@devraelfreeze/discordjs-pagination'
 
 const ITEMS_PER_PAGE = 10
 const MAX_SIZE = 50
@@ -62,26 +62,30 @@ export default new Command({
 
     async run(i, client) {
         const options = i.options
+        if (!i.guild) return
         let guild = client.guildsData.get(i.guild.id)
+        if (guild == undefined) return
+
         const global = options.getBoolean('global')
+
 
         // leaderboard of reviewers by metric
         if (i.options.getSubcommand() == 'leaderboard') {
-            const metric: string = options.getString('metric')
+            const metric: string = options.getString('metric', true)
 
             let guildName: string
 
-            let queryFilter = []
+            let queryFilter: { $match: { guildId: Snowflake } }[] = []
 
             if (global) {
                 guildName = 'All Build Teams'
                 guild = client.guildsData.get('global')
             } else {
                 // for non-global, just find within this guild
-                guildName = i.guild.name
+                guildName = i.guild?.name
 
                 queryFilter = [{
-                    $match: { guildId: i.guild.id }
+                    $match: { guildId: i.guild?.id }
                 }]
             }
 
@@ -114,6 +118,7 @@ export default new Command({
             let finalCollection = {}
 
             submissionQuery.forEach((res) => {
+                // @ts-ignore
                 finalCollection[res._id] = {
                     acceptedCount: res.acceptedCount,
                     feedbackCharacters: res.feedbackChars,
@@ -125,7 +130,9 @@ export default new Command({
             })
 
             rejectionQuery.forEach((res) => {
+                // @ts-ignore
                 if (!finalCollection[res._id]) {
+                    // @ts-ignore
                     finalCollection[res._id] = {
                         acceptedCount: 0,
                         feedbackCharacters: 0,
@@ -135,8 +142,11 @@ export default new Command({
                     }
                 }
 
+                // @ts-ignore
                 finalCollection[res._id].rejectedCount = res.rejectionCount
+                // @ts-ignore
                 finalCollection[res._id].feedbackCharacters += res.feedbackChars
+                // @ts-ignore
                 finalCollection[res._id].feedbackWords += res.feedbackWords
             })
 
@@ -145,28 +155,36 @@ export default new Command({
             for (const [key, value] of Object.entries(finalCollection)) {
                 let res = {
                     reviews: () => {
+                        // @ts-ignore
                         return value['acceptedCount'] + value['rejectedCount']
                     },
                     acceptances: () => {
+                        // @ts-ignore
                         return value['acceptedCount']
                     },
                     rejections: () => {
+                        // @ts-ignore
                         return value['rejectedCount']
                     },
                     feedbackCharsAvg: () => {
+                        // @ts-ignore
                         return value['feedbackCharacters'] / (value['acceptedCount'] + value['rejectedCount'])
                     },
                     feedbackWordsAvg: () => {
+                        // @ts-ignore
                         return value['feedbackWords'] / (value['acceptedCount'] + value['rejectedCount'])
                     },
                     qualityAvg: () => {
+                        // @ts-ignore
                         return value['qualityAverage']
                     },
                     complexityAvg: () => {
+                        // @ts-ignore
                         return value['complexityAverage']
                     }
                 }
 
+                // @ts-ignore
                 leaderboard.push({ id: key, val: res[metric]().toFixed(2).replace(/[.,]00$/, '') })
             }
 
@@ -186,11 +204,11 @@ export default new Command({
                 complexityAvg: 'average complexity reviewed'
             }
 
-            let pages = []
+            let pages: EmbedBuilder[] = []
 
             if (leaderboard.length == 0) {
                 pages = [
-                    new Discord.MessageEmbed()
+                    new EmbedBuilder()
                     .setTitle(`Doesn't look like any reviews have happened here!`)
                     .setDescription('')
                 ]
@@ -199,19 +217,21 @@ export default new Command({
             for (let i = 0; i < Math.ceil(leaderboard.length / ITEMS_PER_PAGE); i++) {
                 const startIndex = i * ITEMS_PER_PAGE
                 const endIndex = startIndex + ITEMS_PER_PAGE
-                const embed = new Discord.MessageEmbed()
-                .setTitle(`${metric.charAt(0).toUpperCase() + metric.slice(1)} Leaderboard for ${guild.emoji} ${guildName} ${guild.emoji}`)
+                const embed = new EmbedBuilder()
+                .setTitle(`${metric.charAt(0).toUpperCase() + metric.slice(1)} Leaderboard for ${guild?.emoji} ${guildName} ${guild?.emoji}`)
                 .setDescription(leaderboard.map((element, index) => {
+                    // @ts-ignore
                     return `**${index + 1}.** <@${element.id}>: ${element.val} ${pluralsMap[metric]}`
                 }).slice(startIndex, endIndex).join('\n\n'))
 
                 pages.push(embed)
             }
 
+            // @ts-ignore
             await pagination({
-                embeds: pages,
-                author: i.user,
-                interaction: i,
+                embeds: <any>pages,
+                author: <any>i.user,
+                interaction: <any>i,
                 ephemeral: false,
                 time: 60 * 1000,
                 disableButtons: true,
@@ -219,21 +239,21 @@ export default new Command({
                 pageTravel: false,
                 buttons: [
                     {
-                        value: TypesButtons.previous,
+                        type: ButtonTypes.previous,
                         label: 'Previous',
-                        style: 'PRIMARY'
+                        style: ButtonStyles.Primary
                     },
                     {
-                        value: TypesButtons.next,
+                        type: ButtonTypes.next,
                         label: 'Next',
-                        style: 'PRIMARY'
+                        style: ButtonStyles.Primary
                     }
                 ]
             })
         } else if (i.options.getSubcommand() == 'individual') {
             // ---------------------------------------------- INDIVIDUAL ----------------------------------------------
-            const user = i.options.getUser('user')
-            const userId = i.options.getUser('user').id
+            const user = i.options.getUser('user', true)
+            const userId = i.options.getUser('user', true)?.id
             let userData: ReviewerInterface
             let guildName: string
 
@@ -309,10 +329,10 @@ export default new Command({
                     }
                 ])
 
-                let feedbackCharsTotal = (submissionFeedback?.[0]?.feedback_chars ?? 0) + (rejectionFeedback?.[0]?.feedback_chars ?? 0);
+                let feedbackCharsTotal = (submissionFeedback?.[0]?.feedback_chars ?? 0) + (rejectionFeedback?.[0]?.feedback_chars ?? 0)
                 let feedbackCharsCount = (submissionFeedback?.[0]?.total ?? 0) + (rejectionFeedback?.[0]?.total ?? 0)
                 let feedbackCharsAverage = feedbackCharsCount > 0 ? feedbackCharsTotal / feedbackCharsCount : 0
-                
+
                 let feedbackWordsTotal = (submissionFeedback?.[0]?.feedback_words ?? 0) + (rejectionFeedback?.[0]?.feedback_words ?? 0)
                 let feedbackWordsCount = (submissionFeedback?.[0]?.total ?? 0) + (rejectionFeedback?.[0]?.total ?? 1)
                 let feedbackWordsAverage = feedbackWordsCount > 0 ? feedbackWordsTotal / feedbackWordsCount : 0
@@ -335,7 +355,7 @@ export default new Command({
                         $match: {
                             $and: [
                                 { reviewer: userId },
-                                { guildId: guild.id }
+                                { guildId: guild?.id }
                             ]
                         }
                     },
@@ -421,10 +441,10 @@ export default new Command({
                     }
                 ])
 
-                let feedbackCharsTotal = (submissionFeedback?.[0]?.feedback_chars ?? 0) + (rejectionFeedback?.[0]?.feedback_chars ?? 0);
+                let feedbackCharsTotal = (submissionFeedback?.[0]?.feedback_chars ?? 0) + (rejectionFeedback?.[0]?.feedback_chars ?? 0)
                 let feedbackCharsCount = (submissionFeedback?.[0]?.total ?? 0) + (rejectionFeedback?.[0]?.total ?? 0)
                 let feedbackCharsAverage = feedbackCharsCount > 0 ? feedbackCharsTotal / feedbackCharsCount : 0
-                
+
                 let feedbackWordsTotal = (submissionFeedback?.[0]?.feedback_words ?? 0) + (rejectionFeedback?.[0]?.feedback_words ?? 0)
                 let feedbackWordsCount = (submissionFeedback?.[0]?.total ?? 0) + (rejectionFeedback?.[0]?.total ?? 1)
                 let feedbackWordsAverage = feedbackWordsCount > 0 ? feedbackWordsTotal / feedbackWordsCount : 0
@@ -443,7 +463,7 @@ export default new Command({
             if (!userData) {
                 return i.editReply({
                     embeds: [
-                        new Discord.MessageEmbed().setDescription(
+                        new EmbedBuilder().setDescription(
                             `\`${user.username}#${user.discriminator}\` is not a reviewer :frowning2: <:sad_cat:873457028981481473>`
                         )
                     ]
@@ -452,13 +472,13 @@ export default new Command({
 
             await i.editReply({
                 embeds: [
-                    new Discord.MessageEmbed()
+                    new EmbedBuilder()
                     .setTitle(`REVIEW ME PLS :AHEGAO_PLEAD:`)
                     .setDescription(
                         `\`${user.username}#${user.discriminator}\` has :tada: ***${
                             userData.reviews
-                        }***  :tada: reviews in ${guild.emoji} ${guildName} ${
-                            guild.emoji
+                        }***  :tada: reviews in ${guild?.emoji} ${guildName} ${
+                            guild?.emoji
                         }!!\n\nNumber of acceptances: :white_check_mark: ***${
                             userData.acceptances || 0
                         }***  :white_check_mark: !!!\nNumber of rejections: :x: ***${

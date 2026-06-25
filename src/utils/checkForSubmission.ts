@@ -7,6 +7,7 @@ import Submission, { SubmissionInterface } from '../struct/Submission.js'
  * @returns true if the submission is in the submissions db
  */
 async function checkIfAccepted(submissionId: string) {
+    // @ts-ignore
     const submission: SubmissionInterface = await Submission.findById(submissionId).exec()
 
     if (submission) {
@@ -20,6 +21,7 @@ async function checkIfAccepted(submissionId: string) {
  * @returns true if the submission is in the rejections db
  */
 async function checkIfRejected(submissionId: string) {
+    // @ts-ignore
     const submission: RejectionInterface = await Rejection.findById(submissionId).exec()
 
     if (submission) {

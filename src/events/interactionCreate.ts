@@ -1,5 +1,5 @@
 import Bot from '../struct/Client.js'
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction, CommandInteraction } from 'discord.js'
 
 export default async function execute(client: Bot, interaction: CommandInteraction) {
     if (
@@ -32,8 +32,8 @@ export default async function execute(client: Bot, interaction: CommandInteracti
 
         await interaction.deferReply()
 
-        command.run(interaction, client)
-        
+        command.run(interaction as ChatInputCommandInteraction, client)
+
     } catch (err) {
         console.log(err)
     }

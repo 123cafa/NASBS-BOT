@@ -9,7 +9,7 @@ import Reviewer from './struct/Reviewer.js'
  * standalone script to merge all users and submissions from one team into another
  * to run, modify the mergeFrom, mergeInto, and mergeFromName vars
  */
-async function run(purgeFrom) {
+async function run(purgeFrom: string) {
     const client = new Bot()
     console.log('Starting purge..')
     await client.loadDatabase()
@@ -35,7 +35,7 @@ async function run(purgeFrom) {
     console.log('Finished')
 
     await mongoose.disconnect()
-    client.destroy()
+    await client.destroy()
 }
 
 

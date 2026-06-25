@@ -1,7 +1,7 @@
 import Bot from './struct/Client.js'
 import { configDotenv } from 'dotenv'
 
-configDotenv()
+configDotenv({ quiet: true })
 
 async function start() {
     const client = new Bot()

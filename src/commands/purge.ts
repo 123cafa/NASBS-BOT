@@ -21,8 +21,11 @@ export default new Command({
     ],
     async run(i, client) {
         const options = i.options
+        if (!i.guild) return
         const guild = client.guildsData.get(i.guild.id)
-        const submissionId = options.getString('submissionid')
+        if (guild == undefined) return
+
+        const submissionId = options.getString('submissionid', true)
         const submitChannel = (await client.channels.fetch(guild.submitChannel)) as TextChannel
 
         let submissionMsg: Message
@@ -53,20 +56,21 @@ export default new Command({
         }
 
         // Delete submission from the database
-        await originalSubmission.deleteOne().catch((err) => {
+        await originalSubmission.deleteOne().catch((err: any) => {
             console.log(err)
             return Responses.errorGeneric(i, err)
         })
 
         // Update user's points
+        // @ts-ignore
         const pointsIncrement = -originalSubmission.pointsTotal
         const buildingCountIncrement = (() => {
             switch (originalSubmission.submissionType) {
                 case 'MANY':
                     return (
-                        -originalSubmission.smallAmt -
-                        originalSubmission.mediumAmt -
-                        originalSubmission.largeAmt
+                        -(originalSubmission.smallAmt || 0) -
+                        (originalSubmission.mediumAmt || 0) -
+                        (originalSubmission.largeAmt || 0)
                     )
                 case 'ONE':
                     return -1
@@ -74,7 +78,9 @@ export default new Command({
                     return 0
             }
         })()
+        // @ts-ignore
         const roadKMsIncrement = -originalSubmission.roadKMs || 0
+        // @ts-ignore
         const sqmIncrement = -originalSubmission.sqm || 0
 
         await Builder.updateOne(
@@ -91,6 +97,7 @@ export default new Command({
         ).exec()
 
         // Remove all bot reactions, then add a '❌' reaction
+        // @ts-ignore
         if (submissionMsg) {
             submissionMsg.reactions.cache.forEach((reaction) => reaction.remove())
         }
@@ -103,6 +110,7 @@ export default new Command({
         // Send a DM to the user if user wants dms
         try {
             if (dmsEnabled) {
+                // @ts-ignore
                 const builder = submissionMsg.author
                 const dm = await builder.createDM()
 

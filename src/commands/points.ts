@@ -20,8 +20,10 @@ export default new Command({
         }
     ],
     async run(i, client) {
-        let guild = client.guildsData.get(i.guild.id)
         const options = i.options
+        if (!i.guild) return
+        let guild = client.guildsData.get(i.guild.id)
+
         const user = options.getUser('user') || i.user
         const global = options.getBoolean('global')
         const userId = user.id
@@ -118,6 +120,6 @@ export default new Command({
 
         let data = query[0]
 
-        return Responses.points(i, user.id, data.points, data.buildings, data.landMetersSquare, data.roadsKMs, guild.emoji, guildName)
+        return Responses.points(i, user.id, data.points, data.buildings, data.landMetersSquare, data.roadsKMs, guild?.emoji, guildName)
     }
 })
