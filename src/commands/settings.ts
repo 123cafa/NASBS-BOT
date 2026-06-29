@@ -124,10 +124,6 @@ export default new Command({
     ],
 
     async run(i, client) {
-        // TODO: I think this will always be true in this bot so likely this is the end of the command for now...
-        /* if (i) {
-            return i.editReply('this command is under construction.')
-        } */
 
         const options = i.options
         const guildId = i.guild.id

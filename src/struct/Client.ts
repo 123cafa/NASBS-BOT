@@ -53,6 +53,7 @@ class Bot extends Client {
                 console.error(e)
             }
         }
+        console.log(`Loaded ${this.commands.size} commands`)
     }
 
     async loadEvents() {
