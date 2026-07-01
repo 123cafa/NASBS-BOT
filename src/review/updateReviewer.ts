@@ -110,6 +110,7 @@ async function updateReviewerForAcceptance(
 
     // now that edit thing is done, add new stats to reviewer
     // get the reviewer to update it
+    // @ts-ignore
     const reviewer: ReviewerInterface = await Reviewer.findOne({
         id: submissionData.reviewer,
         guildId: submissionData.guildId
@@ -188,6 +189,7 @@ async function updateReviewerForRejection(reviewer: ReviewerInterface, feedback:
  */
 async function updateReviewerForPurge(purgedSubmission: SubmissionInterface) {
     // get the reviewer to purge
+    // @ts-ignore
     const reviewer: ReviewerInterface = await Reviewer.findOne({
         id: purgedSubmission.reviewer,
         guildId: purgedSubmission.guildId

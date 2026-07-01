@@ -1,6 +1,6 @@
 import Command from '../struct/Command.js'
 import Submission from '../struct/Submission.js'
-import Discord from 'discord.js'
+import { EmbedBuilder } from 'discord.js'
 
 const MASTER_BUILDER_QUALITY_POINTS = 200
 const ARCHITECT_QUALITY_POINTS = 500
@@ -18,9 +18,12 @@ export default new Command({
         }
     ],
     async run(i, client) {
-        const guildData = client.guildsData.get(i.guild.id)
-        const guildName = guildData.name
         const options = i.options
+        if (!i.guild) return
+        const guildData = client.guildsData.get(i.guild.id)
+        if (guildData == undefined) return
+
+        const guildName = guildData.name
         const user = options.getUser('user') || i.user
 
         let onePoints = { $cond: { if: { $eq: ['$submissionType', 'ONE'] }, then: { $toLong: '$size' }, else: 0 } }
@@ -100,7 +103,7 @@ export default new Command({
 
         if (pointsQuery[0] === undefined) {
             return i.editReply({
-                embeds: [new Discord.MessageEmbed().setDescription(`\<@${user.id}> has no completed builds!`)]
+                embeds: [new EmbedBuilder().setDescription(`\<@${user.id}> has no completed builds!`)]
             })
         }
 
@@ -109,7 +112,7 @@ export default new Command({
         // they are not above a normal builder
         if (points < guildData.rank2.points) {
             return i.editReply({
-                embeds: [new Discord.MessageEmbed().setDescription(
+                embeds: [new EmbedBuilder().setDescription(
                     `**Progress of <@${user.id}> in ${guildData.emoji} ${guildName} ${guildData.emoji}**
                     
                     **Current rank:** ${guildData.rank1.name}
@@ -146,7 +149,7 @@ export default new Command({
             // if more guilds decide to change their requirements, the requirements should be added to the db instead of hardcoded up top
             if (String(i.guild.id) == '692799601983488021') {
                 return i.editReply({
-                    embeds: [new Discord.MessageEmbed().setDescription(
+                    embeds: [new EmbedBuilder().setDescription(
                         `**Progress of <@${user.id}> in ${guildData.emoji} ${guildName} ${guildData.emoji}**
                         
                         **Current rank:** ${guildData.rank2.name}
@@ -161,7 +164,7 @@ export default new Command({
             // default path
             else {
                 return i.editReply({
-                    embeds: [new Discord.MessageEmbed().setDescription(
+                    embeds: [new EmbedBuilder().setDescription(
                         `**Progress of <@${user.id}> in ${guildData.emoji} ${guildName} ${guildData.emoji}**
                         
                         **Current rank:** ${guildData.rank2.name}
@@ -177,7 +180,7 @@ export default new Command({
         // they are not above architect
         if (points < guildData.rank4.points || largeBuildPoints < ARCHITECT_QUALITY_POINTS) {
             return i.editReply({
-                embeds: [new Discord.MessageEmbed().setDescription(
+                embeds: [new EmbedBuilder().setDescription(
                     `**Progress of <@${user.id}> in ${guildData.emoji} ${guildName} ${guildData.emoji}**
                         
                     **Current rank:** ${guildData.rank3.name}
@@ -210,7 +213,7 @@ export default new Command({
 
         if (points < guildData.rank5.points || championBuildPoints < MASTER_BUILDER_QUALITY_POINTS) {
             return i.editReply({
-                embeds: [new Discord.MessageEmbed().setDescription(
+                embeds: [new EmbedBuilder().setDescription(
                     `**Progress of <@${user.id}> in ${guildData.emoji} ${guildName} ${guildData.emoji}**
                     
                     **Current rank:** ${guildData.rank4.name}!
@@ -223,7 +226,7 @@ export default new Command({
         }
 
         return i.editReply({
-            embeds: [new Discord.MessageEmbed().setDescription(
+            embeds: [new EmbedBuilder().setDescription(
                 `**Progress of <@${user.id}> in ${guildData.emoji} ${guildName} ${guildData.emoji}**
                     
                 **Current rank:** ${guildData.rank5.name}!

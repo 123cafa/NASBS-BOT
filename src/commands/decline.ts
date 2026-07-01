@@ -29,9 +29,13 @@ export default new Command({
     ],
     async run(i, client) {
         const options = i.options
+        if (!i.guild) return
         const guild = client.guildsData.get(i.guild.id)
-        const submissionId = options.getString('submissionid')
-        const feedback = validateFeedback(options.getString('feedback'))
+        const submissionId = options.getString('submissionid', true)
+        const feedback = validateFeedback(options.getString('feedback', true))
+
+        if (guild == undefined) return
+
         const submitChannel = (await client.channels.fetch(guild.submitChannel)) as TextChannel
 
         let submissionMsg: Message
@@ -112,6 +116,7 @@ export default new Command({
         await submissionMsg.react('❌')
 
         // update reviewer
+        // @ts-ignore
         await updateReviewerForRejection(reviewer, feedback)
 
         return submissionRejected(i, feedback, submissionMsg.url)

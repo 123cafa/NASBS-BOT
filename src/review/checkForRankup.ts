@@ -1,4 +1,4 @@
-import Discord, { CommandInteraction, GuildMember } from 'discord.js'
+import { CommandInteraction, EmbedBuilder, GuildMember } from 'discord.js'
 import { GuildInterface } from '../struct/Guild.js'
 import Submission from '../struct/Submission.js'
 import Builder from '../struct/Builder.js'
@@ -13,7 +13,7 @@ async function doRankup(
     i: CommandInteraction
 ) {
     // send rankup DM
-    const embed = new Discord.MessageEmbed()
+    const embed = new EmbedBuilder()
     .setTitle(
         `NEW RANK ACHIEVED! You're now a ${emoji} ${emoji} **${name}!** ${emoji} ${emoji}`
     )
@@ -36,6 +36,8 @@ async function checkForRankup(
     guild: GuildInterface,
     i: CommandInteraction
 ) {
+    if (!i.guild) return
+
     // if cant get the member, they must not be in server anymore so cant rankup
     if (!member) {
         return i.followUp('member is no longer in this server')
@@ -69,8 +71,8 @@ async function checkForRankup(
         pointsTotal < guild.rank4.points &&
         !member.roles.cache.get(guild.rank3.id)
     ) {
-        /** check if builder meets guild specific requirements 
-        or has general requirements of 200 pts of >1.5x quality size medium or bigger builds by summing points from ONE and MANY which meet that criteria*/
+        /** check if builder meets guild specific requirements
+         or has general requirements of 200 pts of >1.5x quality size medium or bigger builds by summing points from ONE and MANY which meet that criteria*/
         const userPoints = await Submission.aggregate([
             {
                 $match: {

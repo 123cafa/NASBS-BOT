@@ -1,6 +1,7 @@
 /**
  * Ensure submission feedback is 1700 or fewer characters and slice it if not
  */
+// @ts-ignore
 function validateFeedback(feedback) {
     if (feedback.length <= 1700) {
         return feedback

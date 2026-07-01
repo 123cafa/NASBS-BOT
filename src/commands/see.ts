@@ -1,7 +1,7 @@
 import Command from '../struct/Command.js'
 import Submission, { SubmissionInterface } from '../struct/Submission.js'
 import Rejection, { RejectionInterface } from '../struct/Rejection.js'
-import Discord, { Message, TextChannel } from 'discord.js'
+import { EmbedBuilder, Message, TextChannel } from 'discord.js'
 import { checkIfRejected } from '../utils/checkForSubmission.js'
 import Responses from '../utils/responses.js'
 
@@ -18,11 +18,14 @@ export default new Command({
     ],
     async run(i, client) {
         const options = i.options
+        if (!i.guild) return
         const guildData = client.guildsData.get(i.guild.id)
+        if (guildData == undefined) return
+
         const submitChannel = (await i.guild.channels.fetch(
             guildData.submitChannel
         )) as TextChannel
-        const submissionId = options.getString('id')
+        const submissionId = options.getString('id', true)
         let submissionMsg: Message
         let summary: string
         let submissionLink = '[Link could not be generated]'
@@ -35,6 +38,7 @@ export default new Command({
         }
 
         // get submission from db
+        // @ts-ignore
         const submissionData: SubmissionInterface = await Submission.findById(submissionId).exec()
 
         // check if submission got rejected
@@ -54,6 +58,7 @@ export default new Command({
 
         // if its rejection, get rejection from db
         if (isRejected) {
+            // @ts-ignore
             const rejectionData: RejectionInterface = await Rejection.findById(submissionId).exec()
 
             return i.editReply(Responses.createEmbed(`That submission was rejected. \n\nFeedback: \`${rejectionData.feedback}\``))
@@ -68,6 +73,7 @@ export default new Command({
         switch (submissionData.submissionType) {
             case 'ONE':
                 // write the summary
+                // @ts-ignore
                 summary += `Building type: ${sizeName[submissionData.size]}\n`
                 break
             case 'MANY':
@@ -91,7 +97,7 @@ export default new Command({
 
         // send the review summary
         return i.editReply({
-            embeds: [new Discord.MessageEmbed().setTitle(`Points`).setDescription(summary)]
+            embeds: [new EmbedBuilder().setTitle(`Points`).setDescription(summary)]
         })
     }
 })

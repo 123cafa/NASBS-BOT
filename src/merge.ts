@@ -7,7 +7,7 @@ import mongoose from 'mongoose'
  * standalone script to merge all users and submissions from one team into another
  * to run, modify the mergeFrom, mergeInto, and mergeFromName vars
  */
-async function run(mergeFrom, mergeTo) {
+async function run(mergeFrom: string, mergeTo: string) {
     const client = new Bot()
     console.log('Starting merge..')
     await client.loadDatabase()
@@ -27,7 +27,7 @@ async function run(mergeFrom, mergeTo) {
     console.log('Finished')
 
     await mongoose.disconnect()
-    client.destroy()
+    await client.destroy()
 }
 
 

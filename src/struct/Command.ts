@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from '@discordjs/builders'
-import { CommandInteraction, Interaction } from 'discord.js'
 import Bot from './Client.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 
 class Command {
     name: string
@@ -9,11 +9,12 @@ class Command {
     args?: CommandArg[]
     subCommands?: SubCommandProperties[]
     cooldown?: number
-    run: (i: CommandInteraction, client: Bot) => void
+    run: (i: ChatInputCommandInteraction, client: Bot) => void
 
     constructor(properties: CommandProperties) {
         this.name = properties.name
         this.description = properties.description
+        // @ts-ignore
         this.reviewer = properties.reviewer
         this.args = properties.args
         this.subCommands = properties.subCommands
@@ -23,8 +24,8 @@ class Command {
 
     getData() {
         const Builder = new SlashCommandBuilder()
-            .setName(this.name)
-            .setDescription(this.description)
+        .setName(this.name)
+        .setDescription(this.description)
         if (this.args) {
             addOptions(this.args, Builder)
         }
@@ -40,54 +41,63 @@ class Command {
             })
         }
 
+        // @ts-ignore
         function addOptions(options, builder) {
+            // @ts-ignore
             options.forEach((opt) => {
                 let choices = []
                 if (Array.isArray(opt.choices)) {
-                    choices = opt.choices.map(([name, value]) => ({name, value}))
+                    // @ts-ignore
+                    choices = opt.choices.map(([name, value]) => ({ name, value }))
                 }
 
                 if (opt.optionType == 'string') {
+                    // @ts-ignore
                     builder.addStringOption((option) =>
                         option
-                            .setName(opt.name)
-                            .setDescription(opt.description)
-                            .setChoices(...choices)
-                            .setRequired(opt.required)
+                        .setName(opt.name)
+                        .setDescription(opt.description)
+                        .setChoices(...choices)
+                        .setRequired(opt.required)
                     )
                 } else if (opt.optionType == 'number') {
+                    // @ts-ignore
                     builder.addNumberOption((option) =>
                         option
-                            .setName(opt.name)
-                            .setDescription(opt.description)
-                            .setChoices(...choices)
-                            .setRequired(opt.required)
+                        .setName(opt.name)
+                        .setDescription(opt.description)
+                        .setChoices(...choices)
+                        .setRequired(opt.required)
                     )
                 } else if (opt.optionType == 'integer') {
+                    // @ts-ignore
                     builder.addIntegerOption((option) =>
                         option
-                            .setName(opt.name)
-                            .setDescription(opt.description)
-                            .setChoices(...choices)
-                            .setRequired(opt.required)
+                        .setName(opt.name)
+                        .setDescription(opt.description)
+                        .setChoices(...choices)
+                        .setRequired(opt.required)
                     )
                 } else if (opt.optionType == 'user') {
+                    // @ts-ignore
                     builder.addUserOption((option) =>
                         option
-                            .setName(opt.name)
-                            .setDescription(opt.description)
-                            .setRequired(opt.required)
+                        .setName(opt.name)
+                        .setDescription(opt.description)
+                        .setRequired(opt.required)
                     )
                 } else if (opt.optionType == 'boolean') {
+                    // @ts-ignore
                     builder.addBooleanOption((option) =>
                         option
-                            .setName(opt.name)
-                            .setDescription(opt.description)
-                            .setRequired(opt.required)
+                        .setName(opt.name)
+                        .setDescription(opt.description)
+                        .setRequired(opt.required)
                     )
                 }
             })
         }
+
         return Builder
     }
 }
@@ -119,7 +129,7 @@ interface CommandProperties extends SubCommandProperties {
     reviewer?: boolean
     subCommands?: SubCommandProperties[]
     cooldown?: number
-    run: (i: CommandInteraction, client: Bot) => void
+    run: (i: ChatInputCommandInteraction, client: Bot) => void
 }
 
 export default Command

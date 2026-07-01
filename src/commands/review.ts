@@ -38,13 +38,16 @@ export default new Command({
         }
     ],
     async run(i, client) {
-        const guildData = client.guildsData.get(i.guild.id)
         const options = i.options
+        if (!i.guild) return
+        const guildData = client.guildsData.get(i.guild.id)
+        if (guildData == undefined) return
+
         const submitChannel = (await i.guild.channels.fetch(
             guildData.submitChannel
         )) as TextChannel //await client.channels.fetch(guildData.submitChannel)
-        const submissionId = await options.getString('submissionid')
-        const feedback = validateFeedback(options.getString('feedback'))
+        const submissionId = options.getString('submissionid', true)
+        const feedback = validateFeedback(options.getString('feedback', true))
         const isEdit = options.getBoolean('edit') || false
         let submissionMsg: Message
 
@@ -95,15 +98,17 @@ export default new Command({
         try {
             builder = await i.guild.members.fetch(builderId)
         } catch (e) {
-            builder = null
         }
+
+        // @ts-ignore
+        if (!builder) return
 
         // subcommands
         if (i.options.getSubcommand() == 'one') {
             // set subcmd-specific variables
-            const size = options.getInteger('size')
-            const quality = options.getNumber('quality')
-            const complexity = options.getNumber('complexity')
+            const size = options.getInteger('size', true)
+            const quality = options.getNumber('quality', true)
+            const complexity = options.getNumber('complexity', true)
             let sizeName: string
             pointsTotal = (size * quality * complexity * bonus) / collaborators
             submissionData = {
@@ -128,6 +133,8 @@ export default new Command({
                 case 20:
                     sizeName = 'monumental'
                     break
+                default:
+                    sizeName = ''
             }
             const reply = `gained **${pointsTotal} points!!!**
             
@@ -152,15 +159,16 @@ export default new Command({
                 i
             )
             await checkForRankup(builder, guildData, i)
+            // @ts-ignore
             await updateReviewerForAcceptance(originalSubmission, submissionData, i)
             await sendDm(builder, guildData, reply, i)
             await addCheckmarkReaction(submissionMsg)
         } else if (i.options.getSubcommand() == 'many') {
-            const smallAmt = options.getInteger('smallamt')
-            const mediumAmt = options.getInteger('mediumamt')
-            const largeAmt = options.getInteger('largeamt')
-            const quality = options.getNumber('avgquality')
-            const complexity = options.getNumber('avgcomplexity')
+            const smallAmt = options.getInteger('smallamt', true)
+            const mediumAmt = options.getInteger('mediumamt', true)
+            const largeAmt = options.getInteger('largeamt', true)
+            const quality = options.getNumber('avgquality', true)
+            const complexity = options.getNumber('avgcomplexity', true)
             pointsTotal =
                 ((smallAmt * 2 + mediumAmt * 5 + largeAmt * 10) *
                     quality *
@@ -199,14 +207,15 @@ export default new Command({
                 originalSubmission,
                 i
             )
+            // @ts-ignore
             await updateReviewerForAcceptance(originalSubmission, submissionData, i)
             await sendDm(builder, guildData, reply, i)
             await addCheckmarkReaction(submissionMsg)
         } else if (i.options.getSubcommand() == 'land') {
-            const sqm = options.getNumber('sqm')
-            const landtype = options.getInteger('landtype')
-            const quality = options.getNumber('quality')
-            const complexity = options.getNumber('complexity')
+            const sqm = options.getNumber('sqm', true)
+            const landtype = options.getInteger('landtype', true)
+            const quality = options.getNumber('quality', true)
+            const complexity = options.getNumber('complexity', true)
             pointsTotal =
                 (sqm * landtype * complexity * quality * bonus) / 100000 / collaborators
             submissionData = {
@@ -233,14 +242,15 @@ export default new Command({
             // do review things
             await checkForRankup(builder, guildData, i)
             await addReviewToDb(reply, submissionData, 'sqm', sqm, originalSubmission, i)
+            // @ts-ignore
             await updateReviewerForAcceptance(originalSubmission, submissionData, i)
             await sendDm(builder, guildData, reply, i)
             await addCheckmarkReaction(submissionMsg)
         } else if (i.options.getSubcommand() == 'road') {
-            const roadType = options.getNumber('roadtype')
-            const roadKMs = options.getNumber('distance')
-            const quality = options.getNumber('quality')
-            const complexity = options.getNumber('complexity')
+            const roadType = options.getNumber('roadtype', true)
+            const roadKMs = options.getNumber('distance', true)
+            const quality = options.getNumber('quality', true)
+            const complexity = options.getNumber('complexity', true)
             pointsTotal = (roadType * roadKMs * complexity * quality * bonus) / collaborators
             submissionData = {
                 ...submissionData,
@@ -275,6 +285,7 @@ export default new Command({
                 originalSubmission,
                 i
             )
+            // @ts-ignore
             await updateReviewerForAcceptance(originalSubmission, submissionData, i)
             await sendDm(builder, guildData, reply, i)
             await addCheckmarkReaction(submissionMsg)

@@ -1,5 +1,4 @@
 import Command from '../struct/Command.js'
-import Guild from '../struct/Guild.js'
 
 export default new Command({
     name: 'settings',
@@ -56,7 +55,7 @@ export default new Command({
             return i.editReply('this command is under construction.')
         }
 
-        const options = i.options
+        /*const options = i.options
         const guildId = i.guild.id
         const settings = {
             id: guildId,
@@ -80,6 +79,6 @@ export default new Command({
                 return i.editReply('New server settings successfully created!')
             }
             //  client.guildsData.set(guildId, settings)
-        })
+        })*/
     }
 })

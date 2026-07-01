@@ -1,11 +1,18 @@
 {
-  "compilerOptions": {
-    "outDir": "./built",
-    "target": "ESNext",
-    "module": "ESNext",
-	  "skipLibCheck": true,
-	  "moduleResolution": "NodeNext",
-    "esModuleInterop": true
-  },
-  "include": ["./src/**/*"]
+    "compilerOptions": {
+        "outDir": "./built",
+        "rootDir": "./src",
+        "target": "ES2022",
+        "module": "NodeNext",
+        "skipLibCheck": true,
+        "moduleResolution": "NodeNext",
+        "esModuleInterop": true
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "ts-node": {
+        "skipIgnore": true,
+        "transpileOnly": true
+    }
 }

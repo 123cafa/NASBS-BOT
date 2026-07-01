@@ -1,4 +1,4 @@
-import Discord, { CommandInteraction, GuildMember } from 'discord.js'
+import { CommandInteraction, EmbedBuilder, GuildMember } from 'discord.js'
 import areDmsEnabled from '../utils/areDmsEnabled.js'
 import { GuildInterface } from '../struct/Guild.js'
 
@@ -15,22 +15,22 @@ async function sendDm(
     if (dmsEnabled && member) {
         const dm = await member.createDM()
         await dm
-            .send({
-                embeds: [
-                    new Discord.MessageEmbed()
-                        .setTitle(`${guildData.emoji} Build reviewed! ${guildData.emoji}`)
-                        .setDescription(`You ${reply}`)
-                        .setFooter({
-                            text: `Use the cmd '/preferences' to toggle build review DMs.`
-                        })
-                ]
-            })
-            .catch((err) => {
-                console.log(err)
-                i.followUp(
-                    `\`${member.user.username}#${member.user.discriminator}\` has dms turned off or something went wrong while sending the dm! ${err}`
-                )
-            })
+        .send({
+            embeds: [
+                new EmbedBuilder()
+                .setTitle(`${guildData.emoji} Build reviewed! ${guildData.emoji}`)
+                .setDescription(`You ${reply}`)
+                .setFooter({
+                    text: `Use the cmd '/preferences' to toggle build review DMs.`
+                })
+            ]
+        })
+        .catch((err) => {
+            console.log(err)
+            i.followUp(
+                `\`${member.user.username}#${member.user.discriminator}\` has dms turned off or something went wrong while sending the dm! ${err}`
+            )
+        })
     }
 }
 

@@ -1,5 +1,6 @@
-import Discord from 'discord.js'
+import { EmbedBuilder } from 'discord.js'
 
+// @ts-ignore
 export default async function execute(client, msg) {
     // ignore bot msgs
     if (msg.author.bot) {
@@ -40,6 +41,7 @@ export default async function execute(client, msg) {
 
     // check content of each line of msg to see if one of them contains valid coordinates
     // msg could contain multiple lines due to notes, etc., so that's why check each line
+    // @ts-ignore
     lines.forEach((line) => {
         line = line.replace(/#/g, '')
         if (coordsRegex.test(line) === true) {
@@ -54,12 +56,13 @@ export default async function execute(client, msg) {
 }
 
 // helper func that sends the rejection msg and deletes the submission
+// @ts-ignore
 async function reject(client, msg, guild, reason) {
-    const embed = new Discord.MessageEmbed()
-        .setTitle(`INCORRECT SUBMISSION FORMAT: ${reason}`)
-        .setDescription(
-            `**[Correct format:](${guild.formattingMsg})**\n[Build count]\n[Coordinates]\n[Location name] (OPTIONAL)\n[Image(s) of build]\n\n__The entire submission must be in ONE MESSAGE!__\nView [pinned message](${guild.formattingMsg}) for more details.`
-        )
+    const embed = new EmbedBuilder()
+    .setTitle(`INCORRECT SUBMISSION FORMAT: ${reason}`)
+    .setDescription(
+        `**[Correct format:](${guild.formattingMsg})**\n[Build count]\n[Coordinates]\n[Location name] (OPTIONAL)\n[Image(s) of build]\n\n__The entire submission must be in ONE MESSAGE!__\nView [pinned message](${guild.formattingMsg}) for more details.`
+    )
 
     const rejectionMsg = await msg.channel.send({ embeds: [embed] })
 

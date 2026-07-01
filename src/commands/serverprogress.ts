@@ -14,6 +14,7 @@ export default new Command({
     }],
     async run(i, client) {
         const options = i.options
+        if (!i.guild) return
         const otherServer = options.getString('serverid')
 
         let server = i.guild.id
