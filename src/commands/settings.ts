@@ -164,7 +164,7 @@ export default new Command({
 
         Guild.find({ id: guildId }, async function (err, guild) {
             if (err) return i.editReply(`${err}`)
-            if (guild) {
+            if (guild.length>0) {
                 await Guild.updateOne({ id: guildId }, settings, { upsert: true })
                 if (readBack) {
                     return i.editReply({
@@ -185,9 +185,7 @@ export default new Command({
                     return i.editReply('Server settings successfully updated!')
                 }
             } else {
-                return i.editReply(
-                    'This server is not registered. Use /register to register it.'
-                )
+                return i.editReply('This server is not registered. Use /register to register it.')
             }
         })
     }

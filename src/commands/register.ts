@@ -60,16 +60,14 @@ export default new Command({
         const options = i.options
         const guildId = i.guild.id
 
-        const currentSettings = await Guild.findOne({ id: guildId })
-
-        const buildSubmit = options.getString('buildsubmit') || currentSettings?.submitChannel
-        const serverName = options.getString('name') || currentSettings?.name
-        const reviewRole = options.getString('reviewersrole') || currentSettings?.reviewerRole
-        const rank1id = options.getString('rank1') || currentSettings?.rank1.id
-        const rank2id = options.getString('rank2') || currentSettings?.rank2.id
-        const rank3id = options.getString('rank3') || currentSettings?.rank3.id
-        const rank4id = options.getString('rank4') || currentSettings?.rank4.id
-        const rank5id = options.getString('rank5') || currentSettings?.rank5.id
+        const buildSubmit = options.getString('buildsubmit')
+        const serverName = options.getString('name')
+        const reviewRole = options.getString('reviewersrole')
+        const rank1id = options.getString('rank1')
+        const rank2id = options.getString('rank2')
+        const rank3id = options.getString('rank3')
+        const rank4id = options.getString('rank4')
+        const rank5id = options.getString('rank5')
 
         const settings = {
             id: guildId,
@@ -85,7 +83,7 @@ export default new Command({
 
         Guild.find({ id: guildId }, async function(err, guild) {
             if (err) return i.editReply(`${err}`)
-            if (guild) {
+            if (guild.length>0) {
                 return i.editReply('This server is already registered. Use /settings to edit values.')
             } else {
                 await Guild.updateOne({ id: guildId }, settings, { upsert: true })

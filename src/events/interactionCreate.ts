@@ -15,7 +15,9 @@ export default async function execute(client: Bot, interaction: CommandInteracti
     }
 
     const guildData = client.guildsData.get(interaction.guild.id)
-    if (!guildData) return interaction.reply('This server is not registered')
+    if (!guildData && (interaction.commandName != 'register')) {
+        return interaction.reply('This server is not registered. Ask the server owner to register it by using /register')
+    }
 
     const command = client.commands.get(interaction.commandName)
     if (!command) return
@@ -23,9 +25,18 @@ export default async function execute(client: Bot, interaction: CommandInteracti
     try {
         if (command.reviewer == true) {
             const member = await interaction.guild.members.fetch(interaction.user.id)
-            if (!member.roles.cache.has(guildData.reviewerRole)) {
+            let reviewerRole: string | undefined
+            if (guildData) { reviewerRole = guildData.reviewerRole } else { reviewerRole = null }
+
+            if (guildData && (!member.roles.cache.has(reviewerRole || interaction.guild.ownerId))) {
                 return await interaction.reply(
                     'You do not have permission to use this command.'
+                )
+            }
+            // This allows the server owner to use /register and setup the reviewer role. Otherwise no one can use the bot commands.
+            if (!guildData && !(member.id == interaction.guild.ownerId)) {
+                return await interaction.reply(
+                    'The server is not registered. Ask the server owner to register it by using /register'
                 )
             }
         }
