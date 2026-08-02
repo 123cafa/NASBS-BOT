@@ -1,6 +1,7 @@
 import Command from '../struct/Command.js'
 import Guild from '../struct/Guild.js'
 import { EmbedBuilder } from 'discord.js'
+import Bot from './struct/Client.js'
 
 export default new Command({
     name: 'settings',
@@ -166,6 +167,7 @@ export default new Command({
             if (err) return i.editReply(`${err}`)
             if (guild.length>0) {
                 await Guild.updateOne({ id: guildId }, settings, { upsert: true })
+                console.log('got to command update')
                 if (readBack) {
                     return i.editReply({
                         embeds: [new EmbedBuilder().setDescription(
