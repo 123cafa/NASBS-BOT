@@ -143,11 +143,11 @@ export default new Command({
         let largeBuildPoints = (largerBuildsQuery[0] === undefined) ? 0 : largerBuildsQuery[0].points
 
         // they are not above master builder
-        if (points < guildData.rank3.points || (i.guild.id !== '1377005229618368652' && largeBuildPoints < MASTER_BUILDER_QUALITY_POINTS) || (i.guild.id == '1377005229618368652' && largeBuildPoints < 75)) {
+        if (points < guildData.rank3.points || (i.guild.id !== '692799601983488021' && largeBuildPoints < MASTER_BUILDER_QUALITY_POINTS) || (i.guild.id == '692799601983488021' && largeBuildPoints < 75)) {
 
             // alternate path for Canada
             // if more guilds decide to change their requirements, the requirements should be added to the db instead of hardcoded up top
-            if (String(i.guild.id) == '1377005229618368652') {
+            if (String(i.guild.id) == '692799601983488021') {
                 return i.editReply({
                     embeds: [new EmbedBuilder().setDescription(
                         `**Progress of <@${user.id}> in ${guildData.emoji} ${guildName} ${guildData.emoji}**
