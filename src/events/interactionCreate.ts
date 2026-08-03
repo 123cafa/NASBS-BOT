@@ -2,7 +2,6 @@ import Bot from '../struct/Client.js'
 import { ChatInputCommandInteraction, CommandInteraction } from 'discord.js'
 
 export default async function execute(client: Bot, interaction: CommandInteraction) {
-    console.log(interaction.guild?.id)
     if (
         (!client.test && ['935926834019844097', '1377005229618368652'].includes(interaction.guild?.id)) ||
         (client.test && !['935926834019844097', '1377005229618368652'].includes(interaction.guild?.id))

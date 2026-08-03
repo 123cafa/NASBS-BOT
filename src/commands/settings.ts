@@ -152,7 +152,7 @@ export default new Command({
         const rank3Name = options.getString('rank3name') || guildData?.rank3.name
         const rank4id = options.getString('rank4') || guildData?.rank4.id
         const rank4Points = options.getNumber('rank4points') || guildData?.rank4.points
-        const rank4Name = options.getString('rank4name') || guildData?.rank5.name
+        const rank4Name = options.getString('rank4name') || guildData?.rank4.name
         const rank5id = options.getString('rank5') || guildData?.rank5.id
         const rank5Points = options.getNumber('rank5points') || guildData?.rank5.points
         const rank5Name = options.getString('rank5name') || guildData?.rank5.name
@@ -180,7 +180,7 @@ export default new Command({
                         embeds: [new EmbedBuilder().setDescription(
                                 `Server settings successfully updated!
 
-                                **Server settings for ${serverName}** ${serverEmoji}
+                                **Server settings for ${serverName}** ${serverEmoji || 'Emoji not set'}
                                 **Build submit channel:** <#${buildSubmit}> **Reviewer role:** ${client.guilds.cache.get(guildId).roles.cache.get(reviewRole) || 'Not set'}
                                 **Ranks:**
                                 **${rank1Name}:** ${rank1Points} points (${client.guilds.cache.get(guildId).roles.cache.get(rank1id) || 'Not set'})
