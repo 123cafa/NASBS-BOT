@@ -1,7 +1,6 @@
 import Command from '../struct/Command.js'
 import Guild from '../struct/Guild.js'
 import { EmbedBuilder } from 'discord.js'
-import Bot from './struct/Client.js'
 
 export default new Command({
     name: 'settings',
@@ -23,6 +22,12 @@ export default new Command({
         {
             name: 'name',
             description: 'Name of server',
+            required: false,
+            optionType: 'string'
+        },
+        {
+            name: 'emoji',
+            description: 'Server Emoji',
             required: false,
             optionType: 'string'
         },
@@ -134,6 +139,7 @@ export default new Command({
         const readBack = options.getBoolean('readback')
         const buildSubmit = options.getString('buildsubmit') || guildData?.submitChannel
         const serverName = options.getString('name') || guildData?.name
+        const serverEmoji = options.getString('emoji') || guildData?.emoji
         const reviewRole = options.getString('reviewersrole') || guildData?.reviewerRole
         const rank1id = options.getString('rank1') || guildData?.rank1.id
         const rank1Points = options.getNumber('rank1points') || guildData?.rank1.points
@@ -153,6 +159,7 @@ export default new Command({
 
         const settings = {
             id: guildId,
+            emoji: serverEmoji,
             name: serverName,
             submitChannel: buildSubmit,
             reviewerRole: reviewRole,
@@ -167,13 +174,13 @@ export default new Command({
             if (err) return i.editReply(`${err}`)
             if (guild.length>0) {
                 await Guild.updateOne({ id: guildId }, settings, { upsert: true })
-                console.log('got to command update')
+                await client.loadGuilds()
                 if (readBack) {
                     return i.editReply({
                         embeds: [new EmbedBuilder().setDescription(
                                 `Server settings successfully updated!
 
-                                **Server settings for ${serverName}**
+                                **Server settings for ${serverName}** ${serverEmoji}
                                 **Build submit channel:** <#${buildSubmit}> **Reviewer role:** ${client.guilds.cache.get(guildId).roles.cache.get(reviewRole) || 'Not set'}
                                 **Ranks:**
                                 **${rank1Name}:** ${rank1Points} points (${client.guilds.cache.get(guildId).roles.cache.get(rank1id) || 'Not set'})
