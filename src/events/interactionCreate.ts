@@ -3,8 +3,8 @@ import { ChatInputCommandInteraction, CommandInteraction } from 'discord.js'
 
 export default async function execute(client: Bot, interaction: CommandInteraction) {
     if (
-        (!client.test && interaction.guild?.id == '935926834019844097') ||
-        (client.test && interaction.guild?.id != '935926834019844097')
+        (!client.test && ['935926834019844097', '1377005229618368652'].includes(interaction.guild?.id)) ||
+        (client.test && !['935926834019844097', '1377005229618368652'].includes(interaction.guild?.id))
     )
         return
 

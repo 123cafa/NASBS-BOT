@@ -87,6 +87,7 @@ export default new Command({
                 return i.editReply('This server is already registered. Use /settings to edit values.')
             } else {
                 await Guild.updateOne({ id: guildId }, settings, { upsert: true })
+                await client.loadGuilds()
                 return i.editReply('New server successfully registered! Use /settings to edit the default values.')
             }
         })

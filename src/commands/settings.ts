@@ -26,6 +26,12 @@ export default new Command({
             optionType: 'string'
         },
         {
+            name: 'emoji',
+            description: 'Server Emoji',
+            required: false,
+            optionType: 'string'
+        },
+        {
             name: 'reviewersrole',
             description: 'Reviewer role ID',
             required: false,
@@ -133,6 +139,7 @@ export default new Command({
         const readBack = options.getBoolean('readback')
         const buildSubmit = options.getString('buildsubmit') || guildData?.submitChannel
         const serverName = options.getString('name') || guildData?.name
+        const serverEmoji = options.getString('emoji') || guildData?.emoji
         const reviewRole = options.getString('reviewersrole') || guildData?.reviewerRole
         const rank1id = options.getString('rank1') || guildData?.rank1.id
         const rank1Points = options.getNumber('rank1points') || guildData?.rank1.points
@@ -145,13 +152,14 @@ export default new Command({
         const rank3Name = options.getString('rank3name') || guildData?.rank3.name
         const rank4id = options.getString('rank4') || guildData?.rank4.id
         const rank4Points = options.getNumber('rank4points') || guildData?.rank4.points
-        const rank4Name = options.getString('rank4name') || guildData?.rank5.name
+        const rank4Name = options.getString('rank4name') || guildData?.rank4.name
         const rank5id = options.getString('rank5') || guildData?.rank5.id
         const rank5Points = options.getNumber('rank5points') || guildData?.rank5.points
         const rank5Name = options.getString('rank5name') || guildData?.rank5.name
 
         const settings = {
             id: guildId,
+            emoji: serverEmoji,
             name: serverName,
             submitChannel: buildSubmit,
             reviewerRole: reviewRole,
@@ -166,12 +174,13 @@ export default new Command({
             if (err) return i.editReply(`${err}`)
             if (guild.length>0) {
                 await Guild.updateOne({ id: guildId }, settings, { upsert: true })
+                await client.loadGuilds()
                 if (readBack) {
                     return i.editReply({
                         embeds: [new EmbedBuilder().setDescription(
                                 `Server settings successfully updated!
 
-                                **Server settings for ${serverName}**
+                                **Server settings for ${serverName}** ${serverEmoji || 'Emoji not set'}
                                 **Build submit channel:** <#${buildSubmit}> **Reviewer role:** ${client.guilds.cache.get(guildId).roles.cache.get(reviewRole) || 'Not set'}
                                 **Ranks:**
                                 **${rank1Name}:** ${rank1Points} points (${client.guilds.cache.get(guildId).roles.cache.get(rank1id) || 'Not set'})
