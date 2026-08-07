@@ -1,7 +1,8 @@
-import { EmbedBuilder } from 'discord.js'
+import { EmbedBuilder, Message } from 'discord.js'
+import Bot from '../struct/Client.js'
 
 // @ts-ignore
-export default async function execute(client, msg) {
+export default async function execute(client: Bot, msg: Message) {
     // ignore bot msgs
     if (msg.author.bot) {
         return
