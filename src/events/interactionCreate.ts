@@ -26,9 +26,13 @@ export default async function execute(client: Bot, interaction: CommandInteracti
         if (command.reviewer == true) {
             const member = await interaction.guild.members.fetch(interaction.user.id)
             let reviewerRole: string | undefined
-            if (guildData) { reviewerRole = guildData.reviewerRole } else { reviewerRole = null }
+            if (guildData) {
+                reviewerRole = guildData.reviewerRole
+            } else {
+                reviewerRole = null
+            }
 
-            if (guildData && (!member.roles.cache.has(reviewerRole || interaction.guild.ownerId))) {
+            if (guildData && !(member.roles.cache.has(reviewerRole) || member.id == interaction.guild.ownerId)) {
                 return await interaction.reply(
                     'You do not have permission to use this command.'
                 )
