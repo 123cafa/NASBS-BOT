@@ -9,9 +9,10 @@ export default async function execute(client, msg) {
 
     // production bot ignores test server, and test bot ignores other servers
     // there's probably better way to write this statement, but I don't like thinking
+    console.log(msg.attachments.size)
     if (
-        (!client.test && msg.guild?.id == '935926834019844097') ||
-        (client.test && msg.guild?.id != '935926834019844097')
+        (!client.test && ['935926834019844097', '1377005229618368652'].includes(msg.guild?.id)) ||
+        (client.test && !['935926834019844097', '1377005229618368652'].includes(msg.guild?.id))
     ) {
         return
     }
@@ -26,6 +27,9 @@ export default async function execute(client, msg) {
 
     // otherwise, check each build-submit msg
     // check for images
+    console.log(msg)
+    console.log(msg.attachments)
+    console.log(msg.attachments.size)
     if (msg.attachments.size === 0) {
         return reject(client, msg, guild, 'NO IMAGE FOUND')
     }
